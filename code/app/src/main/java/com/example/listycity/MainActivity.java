@@ -2,6 +2,7 @@ package com.example.listycity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -37,6 +38,17 @@ public class MainActivity extends AppCompatActivity implements AddCityFragment.A
         cityAdapter = new CityArrayAdapter(this, dataList);
         cityList.setAdapter(cityAdapter);
 
+        cityList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Get the city at clicked position
+                City cityToEdit = dataList.get(position);
+                // Show edit dialog
+                AddCityFragment editFragment = AddCityFragment.newInstance(cityToEdit, position);
+                editFragment.show(getSupportFragmentManager(), "Edit City");
+            }
+        });
+
         FloatingActionButton fab = findViewById(R.id.button_add_city);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,4 +67,21 @@ public class MainActivity extends AppCompatActivity implements AddCityFragment.A
         dataList.add(city);
         cityAdapter.notifyDataSetChanged();
     }
+
+    @Override
+    public void editCity(City updatedCity, int position) {
+        // Make sure position is valid
+        if (position >= 0 && position < dataList.size()) {
+            // Get the existing city from the list
+            City existingCity = dataList.get(position);
+
+            // Update its properties with the new values
+            existingCity.setName(updatedCity.getName());
+            existingCity.setProvince(updatedCity.getProvince());
+
+            // Tell the adapter to refresh the display
+            cityAdapter.notifyDataSetChanged();
+        }
+    }
+
 }
